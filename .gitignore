@@ -1,0 +1,8 @@
+build/
+debug/
+CMakeFiles/
+
+CMakeCache.txt
+*.o
+*.mod
+
