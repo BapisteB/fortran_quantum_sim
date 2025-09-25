@@ -1,8 +1,13 @@
+# Cmake
 build/
 debug/
 CMakeFiles/
-
 CMakeCache.txt
+
+# random 
 *.o
 *.mod
+
+# profiling
+gmon.out
 
