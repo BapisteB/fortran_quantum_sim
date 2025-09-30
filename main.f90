@@ -3,37 +3,66 @@ program test_hashmap
     use m_gate
     !implicit none
 
-    complex, dimension(:), allocatable :: amps
-    type(t_gate), dimension(:), allocatable :: gates
     complex, dimension(2, 2) :: mat
-    integer :: s
+    integer :: s, i
     type(t_statevec) :: stv
+    integer, dimension(:), allocatable :: tgt_1, tgt_2
+    type(t_base_gate) :: XBaseGate, YBaseGate, HBaseGate, CNOTBaseGate
+    type(t_gate) :: XGate, YGate
+    integer, dimension(:), allocatable :: y
 
-    type(t_gate) :: XGate = t_gate(0, XBaseGate)
-    type(t_gate) :: YGate = t_gate(0, YBaseGate)
-    integer :: i
-    integer, dimension(2) :: y
+    logical :: compiled_with_openmp = .false.
 
-    stv%amplitudes = amps
+    !$ compiled_with_openmp = .true.
+
+    if (compiled_with_openmp) then 
+        write(*,*) 'OpenMP used...'
+    else
+        write(*,*) 'Openmp not used...'
+    end if
+
+    XBaseGate = make_gate("X", &
+        reshape([cmplx(0, 0), cmplx(1, 0), &
+        cmplx(1, 0), cmplx(0, 0)], [2, 2]))
+
+    YBaseGate = make_gate("Y", &
+        reshape([cmplx(0, 0), cmplx(0, -1), &
+        cmplx(0, 1), cmplx(0, 0)], [2, 2]))
+
+    HBaseGate = make_gate("H", &
+        reshape([cmplx(inv_sqrt2, 0), cmplx(inv_sqrt2, 0), &
+        cmplx(inv_sqrt2, 0), cmplx(-inv_sqrt2, 0)], [2,2]))
+
+    CNOTBaseGate = make_gate("CNOT", &
+        reshape([cmplx(1, 0), cmplx(0, 0), cmplx(0, 0), cmplx(0, 0), &
+        cmplx(0, 0), cmplx(1, 0), cmplx(0, 0), cmplx(0, 0), &
+        cmplx(0, 0), cmplx(0, 0), cmplx(0, 0), cmplx(1, 0), &
+        cmplx(0, 0), cmplx(0, 0), cmplx(1, 0), cmplx(0, 0)], &
+        [4, 4]))
+
     allocate(stv%amplitudes(2 ** 2))
-    
-    call add_gate(stv, XGate)
-    call add_gate(stv, XGate)
-    print *, size(stv%gates)
 
-    do i = 1, size(stv%gates)
-        print *, stv%gates(i)%base_gate%name
-    end do
+    allocate(tgt_1(1))
+    allocate(tgt_2(2))
+    tgt_1(1) = 0
+    tgt_2(1) = 0
+    tgt_2(2) = 1
 
-    do i = 1, size(stv%amplitudes)
-        print *, i, stv%amplitudes(i)
+    do i = 1, 10000
+        call add_gate(stv, t_gate(tgt_1, HBaseGate))
     end do
+    !call add_gate(stv, t_gate(tgt_2, CNOTBaseGate))
+    print *, stv%last_gate_placed
 
     stv%amplitudes(1) = cmplx(1, 0)
+    do i = 1, size(stv%amplitudes)
+        print *, i - 1, stv%amplitudes(i)
+    end do
+
     call compute_stv(stv)
 
     do i = 1, size(stv%amplitudes)
-        print *, i, stv%amplitudes(i)
+        print *, i - 1, stv%amplitudes(i)
     end do
 
 

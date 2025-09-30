@@ -3,20 +3,26 @@ module m_gate
 
     type :: t_base_gate
         character(len=10) :: name
-        complex, dimension(2, 2) :: matrix
+        complex, dimension(:, :), allocatable :: matrix
     end type
 
-
     type :: t_gate
-        integer :: tgt
+        integer, dimension(:), allocatable :: tgt
         type(t_base_gate) :: base_gate
     end type 
 
-    type(t_base_gate), parameter :: XBaseGate = t_base_gate("X", &
-        reshape([cmplx(0, 0), cmplx(1, 0), &
-        cmplx(1, 0), cmplx(0, 0)], [2, 2]))
+    real, parameter :: inv_sqrt2 = 1.0 / sqrt(2.0)
 
-    type(t_base_gate), parameter :: YBaseGate = t_base_gate("Y", &
-        reshape([cmplx(0, 0), cmplx(0, -1), &
-        cmplx(0, 1), cmplx(0, 0)], [2, 2]))
+    contains
+
+        pure function make_gate(name, mat) result(g)
+            character(len=*), intent(in) :: name
+            complex, intent(in) :: mat(:,:)
+            type(t_base_gate) :: g
+
+            g%name = name
+            allocate(g%matrix(size(mat,1), size(mat,2)))
+            g%matrix = mat
+        end function make_gate
+
 end module m_gate
