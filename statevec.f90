@@ -29,7 +29,7 @@ module m_statevec
             capacity = size(stv%gates)
 
             if (stv%last_gate_placed == capacity) then
-                allocate(tmp(capacity * 2))
+                allocate(tmp(capacity * 4))
                 tmp(:capacity) = stv%gates
                 deallocate(stv%gates)
                 call move_alloc(tmp, stv%gates)

@@ -3,13 +3,10 @@ program test_hashmap
     use m_gate
     !implicit none
 
-    complex, dimension(2, 2) :: mat
-    integer :: s, i
+    integer :: i
     type(t_statevec) :: stv
     integer, dimension(:), allocatable :: tgt_1, tgt_2
     type(t_base_gate) :: XBaseGate, YBaseGate, HBaseGate, CNOTBaseGate
-    type(t_gate) :: XGate, YGate
-    integer, dimension(:), allocatable :: y
 
     logical :: compiled_with_openmp = .false.
 
@@ -48,7 +45,7 @@ program test_hashmap
     tgt_2(1) = 0
     tgt_2(2) = 1
 
-    do i = 1, 10000
+    do i = 1, 10000000
         call add_gate(stv, t_gate(tgt_1, HBaseGate))
     end do
     !call add_gate(stv, t_gate(tgt_2, CNOTBaseGate))
